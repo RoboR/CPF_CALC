@@ -238,6 +238,7 @@ while (((RETIRE_DATE - endOfTheMonth).days) >= 30):
         grossSalary = 0
         awsAmount = 0
         yearlyCpfContribution = 0
+        cpfTopupReliefAmount = 0
 
     grossSalary += salary
     
@@ -285,7 +286,7 @@ while (((RETIRE_DATE - endOfTheMonth).days) >= 30):
     oaAmount += oaTopUp
     saAmount += saTopUp
     maAmount += maTopUp
-    cpfTopupReliefAmount += (saAmount + maAmount)
+    cpfTopupReliefAmount += (saTopUp + maTopUp)
     
     # AWS Bonus
     if HAS_AWS and endOfTheMonth.month == 12:
