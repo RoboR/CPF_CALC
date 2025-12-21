@@ -177,7 +177,7 @@ USER_BIRTHDATE = datetime(1990, 10, 4)
 USER_PR_OBTAIN_DATE = datetime(2017, 4, 10)
 currentDate = datetime(2025, 8, 1)
 # currentDate = datetime.now()
-RETIRE_DATE =  datetime(2055, 10, 5)
+RETIRE_DATE =  datetime(2028, 5, 5)
 
 MONTHLY_INCOME = 6500
 CPF_OA_BALANCE = 70095.43
@@ -185,10 +185,10 @@ CPF_SA_BALANCE = 31182
 CPF_MA_BALANCE = 32900.08
 
 HAS_AWS = True
-FIRST_YEAR_AWS_AMOUNT = 0
+FIRST_YEAR_AWS_AMOUNT = 2700
 
-YEARLY_BONUS = 2    # months
-FIRST_YEAR_BONUS_AMOUNT = 0
+YEARLY_BONUS = 1.8    # months
+FIRST_YEAR_BONUS_AMOUNT = 4800
 
 YEARLY_INCREMENT_RATE = 0.04    # percentage
 CPF_TOPUPS = \
@@ -291,10 +291,13 @@ while (((RETIRE_DATE - endOfTheMonth).days) >= 30):
     # AWS Bonus
     if HAS_AWS and endOfTheMonth.month == 12:
         awsAmount = FIRST_YEAR_AWS_AMOUNT if FIRST_YEAR_AWS_AMOUNT else round(grossSalary / 12, 2)
+        FIRST_YEAR_AWS_AMOUNT = 0   # use regular AWS calculation later
+
         awsEmployerContribution, awsEmployeeContribution = GetBonusContributions(awsAmount, userAge, yearlyCpfContribution)
         oaAmount =  round(oaAmount + awsEmployerContribution[0] + awsEmployeeContribution[0], 2)
         saAmount =  round(saAmount + awsEmployerContribution[1] + awsEmployeeContribution[1], 2)
         maAmount =  round(maAmount + awsEmployerContribution[1] + awsEmployeeContribution[2], 2)
+        
         print("###### AWS ######\n", awsAmount, "; CPF", awsEmployerContribution, awsEmployeeContribution,
         "\n#################")
 
@@ -306,9 +309,10 @@ while (((RETIRE_DATE - endOfTheMonth).days) >= 30):
     # Yearly Bonus
     if YEARLY_BONUS and endOfTheMonth.month == 6:
         yearlyBonus = FIRST_YEAR_BONUS_AMOUNT if FIRST_YEAR_BONUS_AMOUNT else round((preYearGrosSalary / 12) * YEARLY_BONUS, 2)
+        FIRST_YEAR_BONUS_AMOUNT = 0 #use regular bonus calculation
         
         bonusEmployerContribution, bonusEmployeeContribution = GetBonusContributions(yearlyBonus, userAge, yearlyCpfContribution)
-        print("$$$$$  BONUS  $$$$$\n", yearlyBonus, "; CPF contriubtion :", bonusEmployerContribution, bonusEmployeeContribution,
+        print("$$$$$  BONUS  $$$$$\n","Amount : ", yearlyBonus, "; CPF contriubtion :", bonusEmployerContribution, bonusEmployeeContribution,
         "\n$$$$$$$$$$$$$$$$$$$")
 
         oaAmount =  round(oaAmount + bonusEmployerContribution[0] + bonusEmployeeContribution[0], 2)
@@ -321,7 +325,7 @@ while (((RETIRE_DATE - endOfTheMonth).days) >= 30):
         oaAmount, saAmount, maAmount = AdjustCpfAccounts(oaAmount, saAmount, maAmount)
     
     # Increment
-    if YEARLY_INCREMENT_RATE and endOfTheMonth.month == 6:
+    if YEARLY_INCREMENT_RATE and endOfTheMonth.month == 4:
         salary += (salary * YEARLY_INCREMENT_RATE)
         
     print(endOfTheMonth.strftime("%Y-%m-%d"), 
@@ -331,7 +335,7 @@ while (((RETIRE_DATE - endOfTheMonth).days) >= 30):
     "; EMPLOYER CPF :", employerContribution, 
     "; EMPLOYEE CPF :", employeeContribution, 
     "; CPF Interest :", oaInterest, saInterest, maInterest,
-    "; CPF Accounts :", oaAmount, saAmount, maAmount,
+    "; \nCPF Acc :", oaAmount, saAmount, maAmount,
     "; taxable income:", round(yearlyTaxableIncome, 2))
     
     endOfTheMonth = GetNextMonthEndDate(endOfTheMonth)
